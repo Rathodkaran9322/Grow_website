@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowwMarket - Live Stocks & Free Demat Account</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: #00d09c !important; /* Groww Green Theme */
+            font-size: 1.5rem;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: #ffffff;
+        }
+        .card-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        .stock-card {
+            cursor: pointer;
+        }
+        .badge-up {
+            background-color: #e6f9f3;
+            color: #00d09c;
+            font-weight: 600;
+        }
+        .badge-down {
+            background-color: #ffebe9;
+            color: #eb5757;
+            font-weight: 600;
+        }
+        .search-box {
+            border-radius: 20px;
+            background-color: #f1f3f5;
+            border: none;
+            padding-left: 40px;
+        }
+        .search-box:focus {
+            background-color: #ffffff;
+            box-shadow: 0 0 0 2px #00d09c;
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .cta-banner {
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+            color: white;
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-2">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-graph-up-arrow"></i> GrowwMarket
+            </a>
+            
+            <div class="position-relative w-50 d-none d-md-block">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" id="searchInput" class="form-control search-box" placeholder="Search stocks (e.g. Tata, Reliance, Zomato)..." onkeyup="filterStocks()">
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+            <a href="https://groww.in" target="_blank" class="btn btn-success fw-bold rounded-pill px-3 shadow-sm" style="background-color: #00d09c; border: none;">
+                    Open Demat Account
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container my-4">
+
+        <!-- Affiliate Earning Banner -->
+        <div class="p-4 p-md-5 mb-4 cta-banner shadow-sm">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="fw-bold mb-2">Start Investing in Stock Market Today!</h2>
+                    <p class="mb-3 fs-6">Open a free Demat Account in 5 minutes with zero brokerage on delivery trades.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="https://groww.in" target="_blank" class="btn btn-light btn-lg fw-bold px-4 py-2 rounded-pill text-success shadow">
+                        🚀 Open Free Account
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Overview (Nifty & Sensex) -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card card-custom p-3 border-start border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-semibold">NIFTY 50</span>
+                            <h3 class="mb-0 fw-bold mt-1">24,834.15</h3>
+                        </div>
+                        <span class="badge badge-up px-3 py-2 fs-6"><i class="bi bi-caret-up-fill"></i> +142.50 (0.58%)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-custom p-3 border-start border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-semibold">SENSEX</span>
+                            <h3 class="mb-0 fw-bold mt-1">81,086.21</h3>
+                        </div>
+                        <span class="badge badge-up px-3 py-2 fs-6"><i class="bi bi-caret-up-fill"></i> +412.30 (0.51%)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Stock Chart Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card card-custom p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h4 class="fw-bold mb-0" id="chartTitle">Tata Consultancy Services (TCS)</h4>
+                            <span class="text-muted fs-6">NSE • Live Price Chart</span>
+                        </div>
+                        <h3 class="fw-bold text-success mb-0" id="chartPrice">₹4,250.00</h3>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="stockChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Stocks Section -->
+        <h5 class="fw-bold mb-3">Popular Stocks</h5>
+        <div class="row g-3" id="stockList">
+            
+            <div class="col-6 col-md-3 stock-item" data-name="Tata Power" onclick="updateChart('Tata Power', '₹412.50', [400, 405, 402, 410, 412.5])">
+                <div class="card card-custom p-3 stock-card h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="bg-light rounded p-2 text-primary fw-bold">TP</div>
+                        <span class="badge badge-up"><i class="bi bi-caret-up-fill"></i> +1.8%</span>
+                    </div>
+                    <h6 class="fw-bold mb-1">Tata Power</h6>
+                    <p class="text-muted small mb-2">Energy Sector</p>
+                    <h6 class="fw-bold mb-0">₹412.50</h6>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 stock-item" data-name="Reliance Industries" onclick="updateChart('Reliance Ind.', '₹2,980.00', [2920, 2940, 2955, 2970, 2980])">
+                <div class="card card-custom p-3 stock-card h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="bg-light rounded p-2 text-danger fw-bold">RIL</div>
+                        <span class="badge badge-down"><i class="bi bi-caret-down-fill"></i> -0.4%</span>
+                    </div>
+                    <h6 class="fw-bold mb-1">Reliance Ind.</h6>
+                    <p class="text-muted small mb-2">Energy & Telecom</p>
+                    <h6 class="fw-bold mb-0">₹2,980.00</h6>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 stock-item" data-name="Zomato" onclick="updateChart('Zomato Ltd.', '₹265.20', [250, 255, 258, 262, 265.2])">
+                <div class="card card-custom p-3 stock-card h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="bg-light rounded p-2 text-warning fw-bold">ZOM</div>
+                        <span class="badge badge-up"><i class="bi bi-caret-up-fill"></i> +3.2%</span>
+                    </div>
+                    <h6 class="fw-bold mb-1">Zomato Ltd.</h6>
+                    <p class="text-muted small mb-2">Tech / Services</p>
+                    <h6 class="fw-bold mb-0">₹265.20</h6>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 stock-item" data-name="HDFC Bank" onclick="updateChart('HDFC Bank', '₹1,640.00', [1620, 1625, 1630, 1638, 1640])">
+                <div class="card card-custom p-3 stock-card h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="bg-light rounded p-2 text-info fw-bold">HDFC</div>
+                        <span class="badge badge-up"><i class="bi bi-caret-up-fill"></i> +0.9%</span>
+                    </div>
+                    <h6 class="fw-bold mb-1">HDFC Bank</h6>
+                    <p class="text-muted small mb-2">Banking Sector</p>
+                    <h6 class="fw-bold mb-0">₹1,640.00</h6>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-white border-top py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-2">© 2026 GrowwMarket. All Rights Reserved.</p>
+            <div class="d-flex justify-content-center gap-3 text-muted small">
+                <a href="#" class="text-decoration-none text-muted">Privacy Policy</a> • 
+                <a href="#" class="text-decoration-none text-muted">Terms of Service</a> • 
+                <a href="#" class="text-decoration-none text-muted">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Section -->
+    <script>
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        
+        let stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['9:15 AM', '11:00 AM', '1:00 PM', '2:30 PM', '3:30 PM'],
+                datasets: [{
+                    label: 'Stock Price (INR)',
+                    data: [4200, 4215, 4208, 4230, 4250],
+                    borderColor: '#00d09c',
+                    backgroundColor: 'rgba(0, 208, 156, 0.1)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: '#f1f3f5' } }
+                }
+            }
+        });
+
+        function updateChart(stockName, price, dataPoints) {
+            document.getElementById('chartTitle').innerText = stockName;
+            document.getElementById('chartPrice').innerText = price;
+            
+            stockChart.data.datasets[0].data = dataPoints;
+            stockChart.update();
+        }
+
+        function filterStocks() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let stockItems = document.querySelectorAll('.stock-item');
+
+            stockItems.forEach(item => {
+                let name = item.getAttribute('data-name').toLowerCase();
+                if (name.includes(input)) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
+    </script>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
